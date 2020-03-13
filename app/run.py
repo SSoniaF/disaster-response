@@ -54,6 +54,8 @@ model = joblib.load("../models/adaboost.pkl")
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
+
+
 def index():
     
     # extract data needed for visuals
@@ -63,6 +65,10 @@ def index():
     
     category_names = df.iloc[:,4:].columns
     category_boolean = (df.iloc[:,4:] != 0).sum().values
+    
+    df["occurrence_categories"] =  df.apply(lambda row: sum(row[:]==1) ,axis=1)
+    occurrences_counts = df.groupby('occurrence_categories').count()['message']
+    occurrences_names = list(df.occurrence_categories.unique())
     
     # create visuals
    
@@ -103,6 +109,26 @@ def index():
                 'xaxis': {
                     'title': "Message Category",
                     'tickangle': 90
+                }
+            }
+        },
+        # visualize occurrences categories   
+        {
+            'data': [
+                Bar(
+                    x=occurrences_names,
+                    y=occurrences_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Frequency of messages assigned to multiple categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Number of categories text messages are assigned to",
+                    'tickangle': 0
                 }
             }
         }

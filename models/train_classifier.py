@@ -18,6 +18,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import classification_report
 from sklearn.metrics import precision_recall_fscore_support as score
 from prettytable import PrettyTable
+from sklearn.model_selection import GridSearchCV
 import pickle
 
 def load_data(database_filepath):
@@ -77,8 +78,17 @@ def build_model():
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(AdaBoostClassifier(n_estimators=100, random_state=0)))
+        ('clf', MultiOutputClassifier(AdaBoostClassifier()))
     ])
+    
+    parameters = {
+       
+        'clf__estimator__n_estimators': [50, 100]
+        
+        } 
+    cv = GridSearchCV(pipeline, param_grid=parameters)    
+    return cv
+
     
     return pipeline
 
